@@ -37,7 +37,7 @@ Output:
 	nixcraft.net                        GODADDY.COM, INC. Valid    11-dec-2009   843  
 
 ## Quick installation
-Use wget command to download and install domain-check script:
+Use `git clone` command to download and install domain-check script:
 
 	$ git clone git@github.com:ashworthconsulting/domain-check.git
 	$ chmod +x domain-check
