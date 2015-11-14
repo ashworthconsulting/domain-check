@@ -281,12 +281,12 @@ check_domain_status()
     if [ "${TLDTYPE}" == "uk" ]; # for .uk domain
     then
 	      REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} -F: '/Registrar:/ && $0 != ""  { getline; REGISTRAR=substr($0,2,17) } END { print REGISTRAR }'`
-    elif [ "${TLDTYPE}" == "fi" ]; # for .fi domain
+    elif [ "${TLDTYPE}" == "fi" ]; # for .fi domain (no registrar info present, so setting static value)
     then
-        REGISTRAR="Ficora"
-    elif [ "${TLDTYPE}" == "io" ]; # for .fi domain
+        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/domain:/ && $2 != ""  { print "Ficora"}'`
+    elif [ "${TLDTYPE}" == "io" ]; # for .io domain (no registrar info present, so setting static value)
     then 
-         REGISTRAR="ICB"
+         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Expiry/ && $2 != ""  { print "ICB"}'`
     elif [ "${TLDTYPE}" == "jp" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrant/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
