@@ -4,9 +4,12 @@
 #
 # Author: Matty < matty91 at gmail dot com >
 # 
-# Current Version: 2.0
+# Current Version: 2.1
 #
 # Revision History:
+#  Version 2.1
+#   Added support for .fi and .io domain names -- Mihail Tchetchelnitski <mihail@mysteerio.fi>
+#
 #  Version 2.0
 #   Bug fix for .org, .biz, info, and .ca -- Cameron and Jim 
 #
@@ -40,7 +43,7 @@
 #  Version 1.0
 #    Initial Release
 #
-# Last Updated: 28-Feb-2014
+# Last Updated: 14-Nov-2015
 #
 # Purpose:
 #  domain-check checks to see if a domain has expired. domain-check
