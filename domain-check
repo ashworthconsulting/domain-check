@@ -127,7 +127,7 @@ AWK="/usr/bin/awk"
 WHOIS="/usr/bin/whois"
 DATE="/bin/date"
 CUT="/usr/bin/cut"
-MAIL="/bin/mail"
+MAIL="/usr/bin/mail"
 # Place to stash temporary files
 WHOIS_TMP="/var/tmp/whois.$$"
 
