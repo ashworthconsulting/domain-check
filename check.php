@@ -13,8 +13,8 @@ if(!file_exists($argv[1])) {
     {
         $line = fgets($file);
         print "Registration Info of Domain: " . $line . PHP_EOL;
-        $whois[] = shell_exec("whois $line");
-//        printf("%s", $whois);
+        $details = shell_exec("whois $line");
+        $whois[$line][] = $details;
         flush();
         sleep(1);
         print "----------------------------------------" . PHP_EOL;
@@ -23,9 +23,27 @@ if(!file_exists($argv[1])) {
 }
 
 if(count($whois)) {
-	$json = json_encode($whois, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+	//$json = json_encode($whois, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+	$counter = 0;
+
+	print "Domain                              Registrar         Status   Expires     Days Left" . PHP_EOL;
+	print "----------------------------------- ----------------- -------- ----------- ---------" . PHP_EOL;
+
+	foreach ($whois as $domain => $info) {
+		$print =  $domain . "\t\t\t\t";
+
+		foreach ($info as $details) {
+			$print .= " Dummy \t" . PHP_EOL;
+		}
+		print $print;
+		// $counter++;
+	}
 	
 //	var_dump(json_decode($json, TRUE));
 } else {
 	print "Couldn't get whois information";
+}
+
+find_in_string($string, $characters) {
+	
 }
