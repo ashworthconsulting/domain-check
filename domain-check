@@ -341,7 +341,13 @@ check_domain_status()
             DOMAINDATE=`cat ${WHOIS_TMP} | awk '/Domain Expiration Date:/ { print $6"-"$5"-"$9 }'`
     elif [ "${TLDTYPE}" == "fi" ]; # for .fi domain dd.mm.yyyy
     then
-            tdomdate=`cat ${WHOIS_TMP} | awk '/expires:/ { print $2 }'`
+            tdomdate=`cat ${WHOIS_TMP} | awk '/expires............:/ { print $2 }'`
+            echo $tdomdate
+            echo $tdomdate1
+            echo $tdomdate2
+            echo $tdomdate3
+            echo $tdomdate4
+            echo $tdomdate5
             tyear=`echo ${tdomdate} | cut -d'.' -f3`
             tmon=`echo ${tdomdate} | cut -d'.' -f2`
             case ${tmon} in
