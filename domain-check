@@ -244,6 +244,9 @@ check_domain_status()
     elif [ "${TLDTYPE}"  == "fi" ]; # Finland
     then
         ${WHOIS} -h "whois.ficora.fi" "${1}" > ${WHOIS_TMP}
+    elif [ "${TLDTYPE}"  == "ru" ]; # Russia
+    then
+        ${WHOIS} -h "whois.ripn.net" "${1}" > ${WHOIS_TMP}
     elif [ "${TLDTYPE}"  == "ee" ]; # Estonia
     then
         ${WHOIS} -h "whois.internet.ee" "${1}" > ${WHOIS_TMP}
@@ -296,15 +299,21 @@ check_domain_status()
     elif [ "${TLDTYPE}" == "jp" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrant/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
-    elif [ "${TLDTYPE}" == "se" ];
+    elif [ "${TLDTYPE}" == "se" -o "${TLDTYPE}" == "ru" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "org" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
+    elif [ "${TLDTYPE}" == "it" ];
+    then
+        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar Organization:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "info" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
+    elif [ "${TLDTYPE}" == "ru" ];
+    then
+        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "biz" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} -F: '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,20,17) } END { print REGISTRAR }'`
@@ -323,7 +332,7 @@ check_domain_status()
     # The whois Expiration data should resemble the following: "Expiration Date: 09-may-2008"
 
     # for .in, .info, .org domains
-    if [ "${TLDTYPE}" == "in" -o "${TLDTYPE}" == "info" -o "${TLDTYPE}" == "org" -o "${TLDTYPE}" == "net" ];
+    if [ "${TLDTYPE}" == "in" -o "${TLDTYPE}" == "info" -o "${TLDTYPE}" == "org" -o "${TLDTYPE}" == "net" -o "${TLDTYPE}" == "me" ];
     then
 	       tdomdate=`cat ${WHOIS_TMP} | ${AWK} '/Expiry Date:/ { print $4 }'`
          tyear=`echo ${tdomdate} | cut -d'-' -f1`
@@ -395,6 +404,28 @@ check_domain_status()
     elif [ "${TLDTYPE}" == "ee" ]; # for .ee domain yyyy-mm-dd
     then
             tdomdate=`cat ${WHOIS_TMP} | awk '/expire:/ { print $2 }'`
+            tyear=`echo ${tdomdate} | cut -d'-' -f1`
+            tmon=`echo ${tdomdate} | cut -d'-' -f2`
+            case ${tmon} in
+               1|01) tmonth=jan ;;
+               2|02) tmonth=feb ;;
+               3|03) tmonth=mar ;;
+               4|04) tmonth=apr ;;
+               5|05) tmonth=may ;;
+               6|06) tmonth=jun ;;
+               7|07) tmonth=jul ;;
+               8|08) tmonth=aug ;;
+               9|09) tmonth=sep ;;
+               10)tmonth=oct ;;
+               11) tmonth=nov ;;
+               12) tmonth=dec ;;
+                *) tmonth=0 ;;
+            esac
+            tday=`echo ${tdomdate} | cut -d'-' -f3`
+            DOMAINDATE=`echo $tday-$tmonth-$tyear`
+    elif [ "${TLDTYPE}" == "ru" ]; # for .ru domain yyyy-mm-dd
+    then
+            tdomdate=`cat ${WHOIS_TMP} | awk '/free-date:/ { print $2 }'`
             tyear=`echo ${tdomdate} | cut -d'-' -f1`
             tmon=`echo ${tdomdate} | cut -d'-' -f2`
             case ${tmon} in
