@@ -244,6 +244,9 @@ check_domain_status()
     elif [ "${TLDTYPE}"  == "fi" ]; # Finland
     then
         ${WHOIS} -h "whois.ficora.fi" "${1}" > ${WHOIS_TMP}
+    elif [ "${TLDTYPE}"  == "dk" ]; # Denmark
+    then
+        ${WHOIS} -h "www.dk-hostmaster.dk" "${1}" > ${WHOIS_TMP}
     elif [ "${TLDTYPE}"  == "ru" ]; # Russia
     then
         ${WHOIS} -h "whois.ripn.net" "${1}" > ${WHOIS_TMP}
