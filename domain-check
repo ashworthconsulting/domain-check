@@ -305,7 +305,7 @@ check_domain_status()
     elif [ "${TLDTYPE}" == "se" -o "${TLDTYPE}" == "ru" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
-    elif [ "${TLDTYPE}" == "org" ];
+    elif [ "${TLDTYPE}" == "org" -o "${TLDTYPE}" == "me" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "it" ];
