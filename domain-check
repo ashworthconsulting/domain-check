@@ -413,14 +413,7 @@ check_domain_status()
             DOMAINDATE=`echo $tday-$tmonth-$tyear`
     elif [ "${TLDTYPE}" == "cn" ]; # for .io domain yyyy-mm-dd
     then
-            tdomdate=`cat ${WHOIS_TMP} | awk '/Expiration Time:/ { print $0 }'`
-            tdomdate1=`cat ${WHOIS_TMP} | awk '/Expiration Time:/ { print $1 }'`
-            tdomdate2=`cat ${WHOIS_TMP} | awk '/Expiration Time:/ { print $2 }'`
-            tdomdate3=`cat ${WHOIS_TMP} | awk '/Expiration Time:/ { print $3 }'`
-            echo $tdomdate
-            echo $tdomdate1
-            echo $tdomdate2
-            echo $tdomdate3
+            tdomdate=`cat ${WHOIS_TMP} | awk '/Expiration Time:/ { print $3 }'`
             tyear=`echo ${tdomdate} | cut -d'-' -f1`
             tmon=`echo ${tdomdate} | cut -d'-' -f2`
             case ${tmon} in
