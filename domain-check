@@ -310,7 +310,7 @@ check_domain_status()
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "it" ];
     then
-        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar Organization:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
+        REGISTRAR=`cat ${WHOIS_TMP} | sed $'s|^\(Registrar.*\)|\f\\1|' | awk ' BEGIN { RS="\f" } /Organization:/ && $3 != ""  { REGISTRAR=substr($3,1,30) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "info" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
