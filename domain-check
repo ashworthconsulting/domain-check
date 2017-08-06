@@ -273,9 +273,9 @@ check_domain_status()
 
     elif [ "${TLDTYPE}"  == "com" -o "${TLDTYPE}"  == "net" -o "${TLDTYPE}"  == "edu" ];
     then
-	${WHOIS} -h ${WHOIS_SERVER} "=${1}" > ${WHOIS_TMP}
+	     ${WHOIS} -h ${WHOIS_SERVER} "=${1}" > ${WHOIS_TMP}
     else
-	${WHOIS} "${1}" > ${WHOIS_TMP}
+	     ${WHOIS} "${1}" > ${WHOIS_TMP}
     fi
 
     # Parse out the expiration date and registrar -- uses the last registrar it finds
@@ -301,10 +301,10 @@ check_domain_status()
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "org" ];
     then
-        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,11,17) } END { print REGISTRAR }'`
+        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "info" ];
     then
-        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,11,17) } END { print REGISTRAR }'`
+        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "biz" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} -F: '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,20,17) } END { print REGISTRAR }'`
