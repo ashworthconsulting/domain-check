@@ -33,9 +33,9 @@ if(count($whois)) {
 		$print =  $domain . "\t\t\t\t";
 
 		foreach ($info as $details) {
-			$print .= " Dummy \t" . PHP_EOL;
+			$print .= " Dummy \t";
 		}
-		print $print;
+		print $print . PHP_EOL;
 		// $counter++;
 	}
 	
@@ -44,6 +44,6 @@ if(count($whois)) {
 	print "Couldn't get whois information";
 }
 
-find_in_string($string, $characters) {
+function find_in_string($string, $characters) {
 	
 }
