@@ -244,6 +244,15 @@ check_domain_status()
     elif [ "${TLDTYPE}"  == "fi" ]; # Finland
     then
         ${WHOIS} -h "whois.ficora.fi" "${1}" > ${WHOIS_TMP}
+    elif [ "${TLDTYPE}"  == "dk" ]; # Denmark
+    then
+        ${WHOIS} -h "www.dk-hostmaster.dk" "${1}" > ${WHOIS_TMP}
+    elif [ "${TLDTYPE}"  == "ru" ]; # Russia
+    then
+        ${WHOIS} -h "whois.ripn.net" "${1}" > ${WHOIS_TMP}
+    elif [ "${TLDTYPE}"  == "ee" ]; # Estonia
+    then
+        ${WHOIS} -h "whois.internet.ee" "${1}" > ${WHOIS_TMP}
     elif [ "${TLDTYPE}"  == "io" ]; # Finland
     then
         ${WHOIS} -h "whois.nic.io" "${1}" > ${WHOIS_TMP}
@@ -270,9 +279,9 @@ check_domain_status()
 
     elif [ "${TLDTYPE}"  == "com" -o "${TLDTYPE}"  == "net" -o "${TLDTYPE}"  == "edu" ];
     then
-	${WHOIS} -h ${WHOIS_SERVER} "=${1}" > ${WHOIS_TMP}
+	     ${WHOIS} -h ${WHOIS_SERVER} "=${1}" > ${WHOIS_TMP}
     else
-	${WHOIS} "${1}" > ${WHOIS_TMP}
+	     ${WHOIS} "${1}" > ${WHOIS_TMP}
     fi
 
     # Parse out the expiration date and registrar -- uses the last registrar it finds
@@ -283,19 +292,31 @@ check_domain_status()
 	      REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} -F: '/Registrar:/ && $0 != ""  { getline; REGISTRAR=substr($0,2,17) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "fi" ]; # for .fi domain (no registrar info present, so setting static value)
     then
-        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/domain:/ && $2 != ""  { print "Ficora"}'`
+        REGISTRAR="Ficora"
+    elif [ "${TLDTYPE}" == "ee" ]; # for .ee domain (no registrar info present, so setting static value)
+    then
+        REGISTRAR="NameISP AB"
     elif [ "${TLDTYPE}" == "io" ]; # for .io domain (no registrar info present, so setting static value)
     then 
-         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Expiry/ && $2 != ""  { print "ICB"}'`
+         REGISTRAR="ICB"
     elif [ "${TLDTYPE}" == "jp" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrant/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
-    elif [ "${TLDTYPE}" == "org" ];
+    elif [ "${TLDTYPE}" == "se" -o "${TLDTYPE}" == "ru" ];
     then
-        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,11,17) } END { print REGISTRAR }'`
+        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
+    elif [ "${TLDTYPE}" == "org" -o "${TLDTYPE}" == "me" ];
+    then
+        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
+    elif [ "${TLDTYPE}" == "it" ];
+    then
+        REGISTRAR=`cat ${WHOIS_TMP} | sed $'s|^\(Registrar.*\)|\f\\1|' | awk ' BEGIN { RS="\f" } /Organization:/ && $3 != ""  { REGISTRAR=substr($3,1,30) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "info" ];
     then
-        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,11,17) } END { print REGISTRAR }'`
+        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
+    elif [ "${TLDTYPE}" == "ru" ];
+    then
+        REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} '/registrar:/ && $2 != ""  { REGISTRAR=substr($2,1,17) } END { print REGISTRAR }'`
     elif [ "${TLDTYPE}" == "biz" ];
     then
         REGISTRAR=`cat ${WHOIS_TMP} | ${AWK} -F: '/Registrar:/ && $2 != ""  { REGISTRAR=substr($2,20,17) } END { print REGISTRAR }'`
@@ -314,7 +335,7 @@ check_domain_status()
     # The whois Expiration data should resemble the following: "Expiration Date: 09-may-2008"
 
     # for .in, .info, .org domains
-    if [ "${TLDTYPE}" == "in" -o "${TLDTYPE}" == "info" -o "${TLDTYPE}" == "org" ];
+    if [ "${TLDTYPE}" == "in" -o "${TLDTYPE}" == "info" -o "${TLDTYPE}" == "org" -o "${TLDTYPE}" == "net" -o "${TLDTYPE}" == "me" ];
     then
 	       tdomdate=`cat ${WHOIS_TMP} | ${AWK} '/Expiry Date:/ { print $4 }'`
          tyear=`echo ${tdomdate} | cut -d'-' -f1`
@@ -332,19 +353,19 @@ check_domain_status()
 	             10)tmonth=oct ;;
 	             11) tmonth=nov ;;
 	             12) tmonth=dec ;;
-               	      *) tmonth=0 ;;
-		esac
-            tday=`echo ${tdomdate} | cut -d'-' -f3 |cut -d'T' -f1`
-	          DOMAINDATE=`echo $tday-$tmonth-$tyear`
+         	      *) tmonth=0 ;;
+	       esac
+         tday=`echo ${tdomdate} | cut -d'-' -f3 |cut -d'T' -f1`
+         DOMAINDATE=`echo $tday-$tmonth-$tyear`
     elif [ "${TLDTYPE}" == "biz" ]; # for .biz domain
     then
             DOMAINDATE=`cat ${WHOIS_TMP} | awk '/Domain Expiration Date:/ { print $6"-"$5"-"$9 }'`
     elif [ "${TLDTYPE}" == "fi" ]; # for .fi domain dd.mm.yyyy
     then
-            tdomdate=`cat ${WHOIS_TMP} | awk '/expires:/ { print $2 }'`
+            tdomdate=`cat ${WHOIS_TMP} | awk '/expires............:/ { print $2 }'`
             tyear=`echo ${tdomdate} | cut -d'.' -f3`
             tmon=`echo ${tdomdate} | cut -d'.' -f2`
-         case ${tmon} in
+            case ${tmon} in
                1|01) tmonth=jan ;;
                2|02) tmonth=feb ;;
                3|03) tmonth=mar ;;
@@ -358,15 +379,15 @@ check_domain_status()
                11) tmonth=nov ;;
                12) tmonth=dec ;;
                 *) tmonth=0 ;;
-          esac
-          tday=`echo ${tdomdate} | cut -d'.' -f1`
-          DOMAINDATE=`echo $tday-$tmonth-$tyear`
+            esac
+            tday=`echo ${tdomdate} | cut -d'.' -f1`
+            DOMAINDATE=`echo $tday-$tmonth-$tyear`
     elif [ "${TLDTYPE}" == "io" ]; # for .io domain yyyy-mm-dd
     then
             tdomdate=`cat ${WHOIS_TMP} | awk '/Expiry :/ { print $3 }'`
             tyear=`echo ${tdomdate} | cut -d'-' -f1`
             tmon=`echo ${tdomdate} | cut -d'-' -f2`
-         case ${tmon} in
+            case ${tmon} in
                1|01) tmonth=jan ;;
                2|02) tmonth=feb ;;
                3|03) tmonth=mar ;;
@@ -380,9 +401,119 @@ check_domain_status()
                11) tmonth=nov ;;
                12) tmonth=dec ;;
                 *) tmonth=0 ;;
-          esac
-          tday=`echo ${tdomdate} | cut -d'-' -f3`
-          DOMAINDATE=`echo $tday-$tmonth-$tyear` 
+            esac
+            tday=`echo ${tdomdate} | cut -d'-' -f3`
+            DOMAINDATE=`echo $tday-$tmonth-$tyear` 
+    elif [ "${TLDTYPE}" == "ee" ]; # for .ee domain yyyy-mm-dd
+    then
+            tdomdate=`cat ${WHOIS_TMP} | awk '/expire:/ { print $2 }'`
+            tyear=`echo ${tdomdate} | cut -d'-' -f1`
+            tmon=`echo ${tdomdate} | cut -d'-' -f2`
+            case ${tmon} in
+               1|01) tmonth=jan ;;
+               2|02) tmonth=feb ;;
+               3|03) tmonth=mar ;;
+               4|04) tmonth=apr ;;
+               5|05) tmonth=may ;;
+               6|06) tmonth=jun ;;
+               7|07) tmonth=jul ;;
+               8|08) tmonth=aug ;;
+               9|09) tmonth=sep ;;
+               10)tmonth=oct ;;
+               11) tmonth=nov ;;
+               12) tmonth=dec ;;
+                *) tmonth=0 ;;
+            esac
+            tday=`echo ${tdomdate} | cut -d'-' -f3`
+            DOMAINDATE=`echo $tday-$tmonth-$tyear`
+    elif [ "${TLDTYPE}" == "ru" ]; # for .ru domain yyyy-mm-dd
+    then
+            tdomdate=`cat ${WHOIS_TMP} | awk '/free-date:/ { print $2 }'`
+            tyear=`echo ${tdomdate} | cut -d'-' -f1`
+            tmon=`echo ${tdomdate} | cut -d'-' -f2`
+            case ${tmon} in
+               1|01) tmonth=jan ;;
+               2|02) tmonth=feb ;;
+               3|03) tmonth=mar ;;
+               4|04) tmonth=apr ;;
+               5|05) tmonth=may ;;
+               6|06) tmonth=jun ;;
+               7|07) tmonth=jul ;;
+               8|08) tmonth=aug ;;
+               9|09) tmonth=sep ;;
+               10)tmonth=oct ;;
+               11) tmonth=nov ;;
+               12) tmonth=dec ;;
+                *) tmonth=0 ;;
+            esac
+            tday=`echo ${tdomdate} | cut -d'-' -f3`
+            DOMAINDATE=`echo $tday-$tmonth-$tyear`
+    elif [ "${TLDTYPE}" == "cn" ]; # for .cn domain yyyy-mm-dd
+    then
+            tdomdate=`cat ${WHOIS_TMP} | awk '/Expiration Time:/ { print $3 }'`
+            tyear=`echo ${tdomdate} | cut -d'-' -f1`
+            tmon=`echo ${tdomdate} | cut -d'-' -f2`
+            case ${tmon} in
+               1|01) tmonth=jan ;;
+               2|02) tmonth=feb ;;
+               3|03) tmonth=mar ;;
+               4|04) tmonth=apr ;;
+               5|05) tmonth=may ;;
+               6|06) tmonth=jun ;;
+               7|07) tmonth=jul ;;
+               8|08) tmonth=aug ;;
+               9|09) tmonth=sep ;;
+               10)tmonth=oct ;;
+               11) tmonth=nov ;;
+               12) tmonth=dec ;;
+                *) tmonth=0 ;;
+            esac
+            tday=`echo ${tdomdate} | cut -d'-' -f3`
+            DOMAINDATE=`echo $tday-$tmonth-$tyear`
+    elif [ "${TLDTYPE}" == "se" ]; # for .se domain yyyy-mm-dd
+    then
+            tdomdate=`cat ${WHOIS_TMP} | awk '/expires:/ { print $2 }'`
+            tyear=`echo ${tdomdate} | cut -d'-' -f1`
+            tmon=`echo ${tdomdate} | cut -d'-' -f2`
+            case ${tmon} in
+               1|01) tmonth=jan ;;
+               2|02) tmonth=feb ;;
+               3|03) tmonth=mar ;;
+               4|04) tmonth=apr ;;
+               5|05) tmonth=may ;;
+               6|06) tmonth=jun ;;
+               7|07) tmonth=jul ;;
+               8|08) tmonth=aug ;;
+               9|09) tmonth=sep ;;
+               10)tmonth=oct ;;
+               11) tmonth=nov ;;
+               12) tmonth=dec ;;
+                *) tmonth=0 ;;
+            esac
+            tday=`echo ${tdomdate} | cut -d'-' -f3`
+            DOMAINDATE=`echo $tday-$tmonth-$tyear`
+    elif [ "${TLDTYPE}" == "it" ]; # for .it domain yyyy-mm-dd
+    then
+            tdomdate=`cat ${WHOIS_TMP} | awk '/Expire Date:/ { print $3 }'`
+            tyear=`echo ${tdomdate} | cut -d'-' -f1`
+            tmon=`echo ${tdomdate} | cut -d'-' -f2`
+            case ${tmon} in
+               1|01) tmonth=jan ;;
+               2|02) tmonth=feb ;;
+               3|03) tmonth=mar ;;
+               4|04) tmonth=apr ;;
+               5|05) tmonth=may ;;
+               6|06) tmonth=jun ;;
+               7|07) tmonth=jul ;;
+               8|08) tmonth=aug ;;
+               9|09) tmonth=sep ;;
+               10)tmonth=oct ;;
+               11) tmonth=nov ;;
+               12) tmonth=dec ;;
+                *) tmonth=0 ;;
+            esac
+            tday=`echo ${tdomdate} | cut -d'-' -f3`
+            DOMAINDATE=`echo $tday-$tmonth-$tyear`
     elif [ "${TLDTYPE}" == "uk" ]; # for .uk domain
     then
             DOMAINDATE=`cat ${WHOIS_TMP} | awk '/Renewal date:/ || /Expiry date:/ { print $3 }'`
@@ -391,7 +522,7 @@ check_domain_status()
 	    tdomdate=`cat ${WHOIS_TMP} | awk '/Expires on/ { print $3 }'`
             tyear=`echo ${tdomdate} | cut -d'/' -f1`
             tmon=`echo ${tdomdate} | cut -d'/' -f2`
-	       case ${tmon} in
+	          case ${tmon} in
 	             1|01) tmonth=jan ;;
 	             2|02) tmonth=feb ;;
 	             3|03) tmonth=mar ;;
@@ -401,35 +532,35 @@ check_domain_status()
 	             7|07) tmonth=jul ;;
 	             8|08) tmonth=aug ;;
 	             9|09) tmonth=sep ;;
-	             10)tmonth=oct ;;
+	             10) tmonth=oct ;;
 	             11) tmonth=nov ;;
 	             12) tmonth=dec ;;
-               	      *) tmonth=0 ;;
-		esac
+         	      *) tmonth=0 ;;
+		        esac
             tday=`echo ${tdomdate} | cut -d'/' -f3`
-	    DOMAINDATE=`echo $tday-$tmonth-$tyear`
+	          DOMAINDATE=`echo $tday-$tmonth-$tyear`
     elif [ "${TLDTYPE}" == "ca" ]; # for .ca 2010/04/30
     then
 	    tdomdate=`cat ${WHOIS_TMP} | awk '/Expiry date/ { print $3 }'`
             tyear=`echo ${tdomdate} | cut -d'/' -f1`
             tmon=`echo ${tdomdate} | cut -d'/' -f2`
-	       case ${tmon} in
-	             1|01) tmonth=jan ;;
-	             2|02) tmonth=feb ;;
-	             3|03) tmonth=mar ;;
-	             4|04) tmonth=apr ;;
-	             5|05) tmonth=may ;;
-	             6|06) tmonth=jun ;;
-	             7|07) tmonth=jul ;;
-	             8|08) tmonth=aug ;;
-	             9|09) tmonth=sep ;;
-	             10)tmonth=oct ;;
-	             11) tmonth=nov ;;
-	             12) tmonth=dec ;;
-               	      *) tmonth=0 ;;
-		esac
+    	      case ${tmon} in
+    	             1|01) tmonth=jan ;;
+    	             2|02) tmonth=feb ;;
+    	             3|03) tmonth=mar ;;
+    	             4|04) tmonth=apr ;;
+    	             5|05) tmonth=may ;;
+    	             6|06) tmonth=jun ;;
+    	             7|07) tmonth=jul ;;
+    	             8|08) tmonth=aug ;;
+    	             9|09) tmonth=sep ;;
+    	             10)tmonth=oct ;;
+    	             11) tmonth=nov ;;
+    	             12) tmonth=dec ;;
+                   	      *) tmonth=0 ;;
+    		    esac
             tday=`echo ${tdomdate} | cut -d'/' -f3`
-	    DOMAINDATE=`echo $tday-$tmonth-$tyear`
+	          DOMAINDATE=`echo $tday-$tmonth-$tyear`
     else # .com, .edu, .net and may work with others	 
 	    DOMAINDATE=`cat ${WHOIS_TMP} | ${AWK} '/Expiration/ { print $NF }'`	
     fi
