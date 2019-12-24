@@ -1,5 +1,5 @@
 # Domain Expiration Check Shell Script
-This script checks to see if a domain has expired. It can be run in both interactive and batch mode, and provides facilities to alarm (notify via email) if a domain is about to expire before it happens. This script supports additional C/TLDs .in, .biz, .org and .info domains, and also includes a 5 second delay to avoid whois server rejecting query.
+This script checks to see if a domain has expired. It can be run in both interactive and batch mode, and provides facilities to alarm (notify via email) if a domain is about to expire before it happens. This script supports additional C/TLDs .in, .fi, .io, .biz, .org and .info domains, and also includes a 5 second delay to avoid whois server rejecting query.
 
 ## Sample usage
 Display expiration date and registrar for theos.in domain:
